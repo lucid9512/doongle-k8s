@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-worker
+  namespace: doongle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ai-worker
+  template:
+    metadata:
+      labels:
+        app: ai-worker
+    spec:
+      runtimeClassName: nvidia          # GPU 런타임
+      containers:
+      - name: worker
+        image: ghcr.io/lucid9512/doongle-ai:latest
+        imagePullPolicy: Always         # 항상 최신 이미지 받기 (latest 태그라)
+        env:
+        - name: KAFKA_BROKER
+          value: "kafka-0.kafka.kafka.svc.cluster.local:9092"
+        - name: KAFKA_TOPIC
+          value: "image-jobs"
+        - name: MODEL
+          value: "google/vit-base-patch16-224"
+        resources:
+          limits:
+            nvidia.com/gpu: 1           # GPU 1개 요청 → 윈1 자동 배치
