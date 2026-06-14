@@ -1,0 +1,17 @@
+# minio/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio                        # 워커·api가 minio.doongle.svc... 로 접근
+  namespace: doongle
+spec:
+  clusterIP: None                    # headless (StatefulSet 안정 네트워크 ID용)
+  selector:
+    app: minio
+  ports:
+  - name: api                        # S3 API
+    port: 9000
+    targetPort: 9000
+  - name: console                    # 웹 콘솔
+    port: 9001
+    targetPort: 9001

@@ -1,0 +1,21 @@
+# minio/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-ui
+  namespace: doongle
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"  # 콘솔 대용량 업로드 대비 (기본 1m → 413 방지)
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: minio-ui.doongle.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: minio
+            port:
+              number: 9001

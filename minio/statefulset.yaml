@@ -1,0 +1,46 @@
+# minio/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+  namespace: doongle
+spec:
+  serviceName: minio                 # 위 headless service 이름과 일치
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: lucid # 윈1 고정 (GPU 미사용이라 자동배치 불가 → 명시)
+      containers:
+      - name: minio
+        image: cgr.dev/chainguard/minio:latest
+        args:                        # Chainguard 기본 엔트리포인트는 플래그 없음 → 직접 명시
+        - server
+        - /data
+        - --console-address
+        - ":9001"
+        envFrom:
+        - secretRef:
+            name: minio-credentials  # MINIO_ROOT_USER / PASSWORD 주입
+        ports:
+        - containerPort: 9000
+          name: api
+        - containerPort: 9001
+          name: console
+        volumeMounts:
+        - name: data
+          mountPath: /data
+  volumeClaimTemplates:              # local-path provisioner가 윈1 로컬 디스크에 PV 자동 생성
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
