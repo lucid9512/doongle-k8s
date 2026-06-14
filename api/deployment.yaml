@@ -1,0 +1,37 @@
+# api/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doongle-api
+  namespace: doongle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: doongle-api
+  template:
+    metadata:
+      labels:
+        app: doongle-api
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: desktop-6iceuch   # 윈2 일반노드 (api는 GPU 불필요)
+      containers:
+      - name: api
+        image: ghcr.io/lucid9512/doongle-api:latest
+        imagePullPolicy: Always                     # latest 태그라 항상 최신
+        envFrom:                                    # ConfigMap + Secret 통째 주입
+        - configMapRef:
+            name: doongle-config                    # KAFKA_BROKER/TOPIC, STORAGE, MINIO_ENDPOINT 등
+        - secretRef:
+            name: postgres-credentials              # DATABASE_URL (+ 안 쓰는 POSTGRES_* 무해)
+        - secretRef:
+            name: minio-client                      # MINIO_ACCESS_KEY / SECRET_KEY
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"                         # 윈2 RAM 빠듯 → Kafka와 공존하게 작게

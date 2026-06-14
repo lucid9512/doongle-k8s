@@ -1,3 +1,4 @@
+# worker/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -13,18 +14,18 @@ spec:
       labels:
         app: ai-worker
     spec:
-      runtimeClassName: nvidia          # GPU 런타임
+      runtimeClassName: nvidia                      # GPU 런타임
       containers:
       - name: worker
         image: ghcr.io/lucid9512/doongle-ai:latest
-        imagePullPolicy: Always         # 항상 최신 이미지 받기 (latest 태그라)
-        env:
-        - name: KAFKA_BROKER
-          value: "kafka-0.kafka.kafka.svc.cluster.local:9092"
-        - name: KAFKA_TOPIC
-          value: "image-jobs"
-        - name: MODEL
-          value: "google/vit-base-patch16-224"
+        imagePullPolicy: Always
+        envFrom:                                    # 하드코딩 env 제거 → ConfigMap/Secret 주입
+        - configMapRef:
+            name: doongle-config                    # KAFKA_BROKER/TOPIC/GROUP_ID, MODEL, MINIO_* 등
+        - secretRef:
+            name: postgres-credentials              # DATABASE_URL
+        - secretRef:
+            name: minio-client                      # MINIO_ACCESS_KEY / SECRET_KEY
         resources:
           limits:
-            nvidia.com/gpu: 1           # GPU 1개 요청 → 윈1 자동 배치
+            nvidia.com/gpu: 1                       # GPU 1개 요청 → 윈1 자동 배치
