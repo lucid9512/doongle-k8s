@@ -1,0 +1,6 @@
+
+# 평문 Secret 금지 (SealedSecret만 커밋). secret.yaml 패턴은 추적 안 함
+secret.yaml
+**/secret.yaml
+.env
+.DS_Store
