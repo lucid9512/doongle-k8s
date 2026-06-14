@@ -1,0 +1,14 @@
+# postgres/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres                     # api·워커가 postgres.doongle.svc... 로 접근
+  namespace: doongle
+spec:
+  clusterIP: None                    # headless (StatefulSet 안정 네트워크 ID)
+  selector:
+    app: postgres
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: 5432

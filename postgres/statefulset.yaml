@@ -1,0 +1,42 @@
+# postgres/statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: doongle
+spec:
+  serviceName: postgres              # 위 headless service 이름과 일치
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: lucid # 윈1 고정 (상태 저장소 집약, GPU 미사용)
+      containers:
+      - name: postgres
+        image: postgres:18
+        envFrom:
+        - secretRef:
+            name: postgres-credentials # POSTGRES_USER/PASSWORD/DB 주입
+        env:
+        - name: PGDATA               # 데이터 하위경로 지정 (아래 주석 참고)
+          value: /var/lib/postgresql/data/pgdata
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:              # local-path provisioner가 윈1 디스크에 PV 생성
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
