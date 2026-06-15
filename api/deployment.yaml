@@ -22,11 +22,13 @@ spec:
         imagePullPolicy: Always                     # latest 태그라 항상 최신
         envFrom:                                    # ConfigMap + Secret 통째 주입
         - configMapRef:
-            name: doongle-config                    # KAFKA_BROKER/TOPIC, STORAGE, MINIO_ENDPOINT 등
+            name: doongle-config
         - secretRef:
-            name: postgres-credentials              # DATABASE_URL (+ 안 쓰는 POSTGRES_* 무해)
+            name: postgres-credentials
         - secretRef:
-            name: minio-client                      # MINIO_ACCESS_KEY / SECRET_KEY
+            name: minio-client
+        - secretRef:                    # ← 이거 추가
+            name: doongle-app-secret    # SECRET_KEY / ADMIN_SECRET_KEY / JWT_SECRETCRET_KEY
         ports:
         - containerPort: 8000
         resources:

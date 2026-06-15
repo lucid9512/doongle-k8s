@@ -1,0 +1,13 @@
+# api/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: doongle-api
+  namespace: doongle
+spec:
+  selector:
+    app: doongle-api        # Deployment의 pod 라벨과 일치
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
