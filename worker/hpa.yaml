@@ -1,0 +1,20 @@
+# worker/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ai-worker
+  namespace: doongle
+spec:
+  scaleTargetRef:                 # 무엇을 스케일할지
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ai-worker               # worker deployment 이름
+  minReplicas: 1                  # 최소 1개
+  maxReplicas: 3                  # 최대 3개까지
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50    # CPU 평균 50% 넘으면 늘림

@@ -27,5 +27,7 @@ spec:
         - secretRef:
             name: minio-client                      # MINIO_ACCESS_KEY / SECRET_KEY
         resources:
+          requests:
+            cpu: 100m              # HPA가 CPU % 계산하는 기준 (추가)
           limits:
             nvidia.com/gpu: 1                       # GPU 1개 요청 → 윈1 자동 배치
