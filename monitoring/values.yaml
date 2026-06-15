@@ -1,0 +1,47 @@
+# monitoring/values.yaml
+# kube-prometheus-stack 경량 설정 (홈랩 / 윈1 배치)
+
+# --- Prometheus ---
+prometheus:
+  prometheusSpec:
+    retention: 7d                      # 메트릭 7일만 보존 (디스크/메모리 절약)
+    nodeSelector:
+      kubernetes.io/hostname: lucid    # 윈1 배치
+    resources:
+      requests:
+        memory: 400Mi
+      limits:
+        memory: 1Gi                    # 메모리 폭주 방지
+    # 영속 저장 (재시작해도 메트릭 유지)
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
+
+# --- Grafana ---
+grafana:
+  admin:
+    existingSecret: grafana-admin       # SealedSecret으로 만든 그 Secret
+    userKey: admin-user
+    passwordKey: admin-password
+  nodeSelector:
+    kubernetes.io/hostname: lucid
+
+# --- Alertmanager: 데모엔 불필요 → 끄기 (자원 절약) ---
+alertmanager:
+  enabled: false
+
+# --- 나머지 컴포넌트도 윈1 배치 ---
+prometheus-node-exporter:
+  enabled: false
+  # node-exporter는 모든 노드에 떠야 함 (DaemonSet) → nodeSelector 안 검
+
+kube-state-metrics:
+  nodeSelector:
+    kubernetes.io/hostname: lucid
+prometheusOperator:
+  nodeSelector:
+    kubernetes.io/hostname: lucid

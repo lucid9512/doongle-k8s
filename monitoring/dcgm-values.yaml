@@ -1,0 +1,15 @@
+# monitoring/dcgm-values.yaml
+# DCGM exporter: GPU 메트릭 수집 (윈1 GPU 노드 전용)
+
+# GPU가 있는 윈1에만 배치 (윈2는 GPU 없음)
+nodeSelector:
+  kubernetes.io/hostname: lucid
+
+# GPU 접근용 런타임 (워커가 쓰던 nvidia 런타임)
+runtimeClassName: nvidia
+
+# Prometheus(kube-prometheus-stack)가 자동 수집하도록 ServiceMonitor 생성
+serviceMonitor:
+  enabled: true
+  additionalLabels:
+    release: monitoring        # 우리 Prometheus가 이 라벨로 ServiceMonitor를 찾음
