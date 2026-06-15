@@ -1,0 +1,13 @@
+# argocd/values.yaml
+# 글로벌 nodeSelector: 모든 ArgoCD 컴포넌트를 윈1(lucid)에 배치
+# (윈2는 메모리 75%로 빠듯 → 무거운 컴포넌트는 여유 있는 윈1로)
+global:
+  nodeSelector:
+    kubernetes.io/hostname: lucid
+
+# dex(SSO)는 단독 사용이라 불필요 → 비활성화로 자원 절약
+dex:
+  enabled: false
+
+# 단일 사용자 홈랩이라 HA 불필요 → 기본 단일 레플리카 유지
+# (기본값이 이미 단일이라 별도 설정 없음)
