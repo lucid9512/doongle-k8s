@@ -1,0 +1,24 @@
+# argo-apps/root.yaml
+# App-of-Apps 최상위 Application.
+# argo-apps/ 폴더 안의 Application 정의들을 클러스터에 생성한다.
+# 이 root 하나만 ArgoCD에 등록하면 나머지 컴포넌트 App이 줄줄이 따라온다.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lucid9512/doongle-k8s
+    targetRevision: HEAD
+    path: argo-apps                        # 이 폴더의 Application YAML들을 동기화
+    directory:
+      recurse: false                       # argo-apps 바로 아래 .yaml만 (하위폴더 안 들어감)
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd                      # Application 리소스는 argocd 네임스페이스에
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    # 수동 동기화 (automated 없음)

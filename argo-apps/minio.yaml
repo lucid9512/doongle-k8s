@@ -1,0 +1,19 @@
+# argo-apps/minio.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: minio
+  namespace: argocd                       # Application 리소스는 argocd 네임스페이스에 둔다
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/lucid9512/doongle-k8s
+    targetRevision: HEAD
+    path: minio                         # 이 컴포넌트의 매니페스트 폴더
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: doongle                      # 배포 대상 네임스페이스
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true                # 네임스페이스 없으면 생성 (재구축 대비)
+    # 수동 동기화: automated 블록 없음 → SYNC 버튼으로 반영
