@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: harness-demo
+  namespace: agent-harness
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: harness-demo
+  template:
+    metadata:
+      labels:
+        app: harness-demo
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: desktop-6iceuch   # 윈2 (GPU 불필요, 가벼움)
+      containers:
+      - name: harness-demo
+        image: ghcr.io/lucid9512/harness-demo:v1
+        imagePullPolicy: Always
+        env:
+        - name: FAIL
+          value: "false"                          # v1 = 정상
+        resources:
+          requests:
+            cpu: 50m
+            memory: 32Mi
+          limits:
+            memory: 64Mi

@@ -1,0 +1,39 @@
+# harness/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: agent
+  namespace: agent-harness
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: agent-operator
+  namespace: agent-harness          # 이 네임스페이스 안에서만
+rules:
+# 조회 (관측·진단)
+- apiGroups: [""]
+  resources: ["pods", "pods/log", "events"]
+  verbs: ["get", "list", "watch"]
+# deployment 조회 + rollout 조작 (롤백)
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch", "update", "patch"]
+# rollout undo 시 deployment 스케일/롤백에 필요
+- apiGroups: ["apps"]
+  resources: ["deployments/rollback"]
+  verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: agent-operator-binding
+  namespace: agent-harness
+subjects:
+- kind: ServiceAccount
+  name: agent
+  namespace: agent-harness
+roleRef:
+  kind: Role
+  name: agent-operator
+  apiGroup: rbac.authorization.k8s.io
